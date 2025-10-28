@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
-import { insertNewsletterSubscriptionSchema, insertPoemSchema } from "@shared/schema";
+import { insertNewsletterSubscriptionSchema, insertPoemSchema, insertCollectionSchema, insertEventSchema, insertProductSchema, insertJournalPostSchema } from "@shared/schema";
 import { requireAuth } from "./auth";
 import { z } from "zod";
 
@@ -43,6 +43,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(collection);
     } catch (error) {
       console.error("Error fetching collection:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/collections", requireAuth, async (req, res) => {
+    try {
+      const validated = insertCollectionSchema.parse(req.body);
+      const collection = await storage.createCollection(validated);
+      res.json(collection);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation error", details: error.errors });
+      }
+      console.error("Error creating collection:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/collections/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteCollection(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting collection:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -146,6 +170,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/events", requireAuth, async (req, res) => {
+    try {
+      console.log("Event creation request body:", JSON.stringify(req.body, null, 2));
+      const validated = insertEventSchema.parse(req.body);
+      console.log("Validated event data:", JSON.stringify(validated, null, 2));
+      const event = await storage.createEvent(validated);
+      res.json(event);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        console.error("Zod validation error:", JSON.stringify(error.errors, null, 2));
+        return res.status(400).json({ error: "Validation error", details: error.errors });
+      }
+      console.error("Error creating event:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/events/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteEvent(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Testimonials
   app.get("/api/testimonials", async (_req, res) => {
     try {
@@ -174,6 +225,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(products);
     } catch (error) {
       console.error("Error fetching featured products:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/products", requireAuth, async (req, res) => {
+    try {
+      const validated = insertProductSchema.parse(req.body);
+      const product = await storage.createProduct(validated);
+      res.json(product);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation error", details: error.errors });
+      }
+      console.error("Error creating product:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/products/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteProduct(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting product:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -209,6 +284,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/journal", requireAuth, async (req, res) => {
+    try {
+      const validated = insertJournalPostSchema.parse(req.body);
+      const post = await storage.createJournalPost(validated);
+      res.json(post);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation error", details: error.errors });
+      }
+      console.error("Error creating journal post:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/journal/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deleteJournalPost(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting journal post:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   // Newsletter
   app.post("/api/newsletter", async (req, res) => {
     try {
@@ -228,6 +327,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(409).json({ error: "Email already subscribed" });
       }
       console.error("Error subscribing to newsletter:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.get("/api/newsletter/subscribers", requireAuth, async (_req, res) => {
+    try {
+      const subscribers = await storage.getNewsletterSubscriptions();
+      res.json(subscribers);
+    } catch (error) {
+      console.error("Error fetching newsletter subscribers:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });

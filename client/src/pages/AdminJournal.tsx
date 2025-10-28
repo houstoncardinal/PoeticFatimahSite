@@ -6,14 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { ArrowLeft, Plus, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import type { Poem, Collection } from "@shared/schema";
+import type { JournalPost } from "@shared/schema";
 
-export default function AdminPoems() {
+export default function AdminJournal() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -22,41 +21,35 @@ export default function AdminPoems() {
     slug: "",
     body: "",
     excerpt: "",
-    collectionId: "",
-    themes: "",
+    category: "",
     audioUrl: "",
-    transcript: "",
     imageUrl: "",
   });
 
   const { data: user, isLoading: authLoading } = useQuery({ queryKey: ["/api/auth/me"], retry: false });
-  const { data: poems, isLoading: poemsLoading } = useQuery<Poem[]>({ queryKey: ["/api/poems"] });
-  const { data: collections } = useQuery<Collection[]>({ queryKey: ["/api/collections"] });
+  const { data: posts, isLoading } = useQuery<JournalPost[]>({ queryKey: ["/api/journal"] });
 
   const createMutation = useMutation({
-    mutationFn: async (data: any) => {
-      const themes = data.themes ? data.themes.split(",").map((t: string) => t.trim()) : [];
-      return apiRequest("POST", "/api/poems", { ...data, themes });
-    },
+    mutationFn: async (data: any) => apiRequest("POST", "/api/journal", data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/poems"] });
-      toast({ title: "Poem created successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/journal"] });
+      toast({ title: "Journal post created successfully" });
       setIsDialogOpen(false);
       resetForm();
     },
     onError: () => {
-      toast({ title: "Error creating poem", variant: "destructive" });
+      toast({ title: "Error creating journal post", variant: "destructive" });
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => apiRequest("DELETE", `/api/poems/${id}`, {}),
+    mutationFn: async (id: string) => apiRequest("DELETE", `/api/journal/${id}`, {}),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/poems"] });
-      toast({ title: "Poem deleted successfully" });
+      queryClient.invalidateQueries({ queryKey: ["/api/journal"] });
+      toast({ title: "Journal post deleted successfully" });
     },
     onError: () => {
-      toast({ title: "Error deleting poem", variant: "destructive" });
+      toast({ title: "Error deleting journal post", variant: "destructive" });
     },
   });
 
@@ -75,10 +68,8 @@ export default function AdminPoems() {
       slug: "",
       body: "",
       excerpt: "",
-      collectionId: "",
-      themes: "",
+      category: "",
       audioUrl: "",
-      transcript: "",
       imageUrl: "",
     });
   };
@@ -101,19 +92,19 @@ export default function AdminPoems() {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
-            <h1 className="text-3xl font-serif font-bold">Manage Poems</h1>
+            <h1 className="text-3xl font-serif font-bold">Manage Journal</h1>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button data-testid="button-create-poem">
+              <Button data-testid="button-create-post">
                 <Plus className="h-4 w-4 mr-2" />
-                Add Poem
+                Add Post
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Create New Poem</DialogTitle>
-                <DialogDescription>Add a new poem to your collection</DialogDescription>
+                <DialogTitle>Create New Journal Post</DialogTitle>
+                <DialogDescription>Add a blog post, reflection, or announcement</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -139,7 +130,7 @@ export default function AdminPoems() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="body">Poem Text *</Label>
+                  <Label htmlFor="body">Post Content *</Label>
                   <Textarea
                     id="body"
                     value={formData.body}
@@ -155,33 +146,19 @@ export default function AdminPoems() {
                     id="excerpt"
                     value={formData.excerpt}
                     onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                    rows={3}
+                    rows={2}
                     data-testid="input-excerpt"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="collection">Collection</Label>
-                  <Select value={formData.collectionId} onValueChange={(value) => setFormData({ ...formData, collectionId: value })}>
-                    <SelectTrigger data-testid="select-collection">
-                      <SelectValue placeholder="Select collection" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {collections?.map((col) => (
-                        <SelectItem key={col.id} value={col.id}>
-                          {col.title}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="themes">Themes (comma-separated)</Label>
+                  <Label htmlFor="category">Category *</Label>
                   <Input
-                    id="themes"
-                    value={formData.themes}
-                    onChange={(e) => setFormData({ ...formData, themes: e.target.value })}
-                    placeholder="Healing, Love, Growth"
-                    data-testid="input-themes"
+                    id="category"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    required
+                    placeholder="Reflections, Announcements, etc."
+                    data-testid="input-category"
                   />
                 </div>
                 <div>
@@ -195,7 +172,7 @@ export default function AdminPoems() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="imageUrl">Image URL</Label>
+                  <Label htmlFor="imageUrl">Cover Image URL</Label>
                   <Input
                     id="imageUrl"
                     type="url"
@@ -206,7 +183,7 @@ export default function AdminPoems() {
                 </div>
                 <div className="flex gap-2">
                   <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit">
-                    {createMutation.isPending ? "Creating..." : "Create Poem"}
+                    {createMutation.isPending ? "Creating..." : "Create Post"}
                   </Button>
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                     Cancel
@@ -219,41 +196,35 @@ export default function AdminPoems() {
 
         <Card>
           <CardHeader>
-            <CardTitle>All Poems ({poems?.length || 0})</CardTitle>
+            <CardTitle>All Posts ({posts?.length || 0})</CardTitle>
           </CardHeader>
           <CardContent>
-            {poemsLoading ? (
-              <p className="text-muted-foreground">Loading poems...</p>
-            ) : poems && poems.length > 0 ? (
+            {isLoading ? (
+              <p className="text-muted-foreground">Loading journal posts...</p>
+            ) : posts && posts.length > 0 ? (
               <div className="space-y-4">
-                {poems.map((poem) => (
+                {posts.map((post) => (
                   <div
-                    key={poem.id}
+                    key={post.id}
                     className="flex items-start justify-between p-4 border rounded-lg hover-elevate"
-                    data-testid={`poem-${poem.slug}`}
+                    data-testid={`post-${post.slug}`}
                   >
                     <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{poem.title}</h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">{poem.excerpt || poem.body.substring(0, 100) + "..."}</p>
-                      {poem.themes && poem.themes.length > 0 && (
-                        <div className="flex gap-2 mt-2">
-                          {poem.themes.map((theme, i) => (
-                            <span key={i} className="text-xs px-2 py-1 bg-muted rounded">
-                              {theme}
-                            </span>
-                          ))}
-                        </div>
-                      )}
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-lg">{post.title}</h3>
+                        <span className="text-xs px-2 py-1 bg-muted rounded">{post.category}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt || post.body.substring(0, 150) + "..."}</p>
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => {
-                        if (confirm(`Delete "${poem.title}"?`)) {
-                          deleteMutation.mutate(poem.id);
+                        if (confirm(`Delete "${post.title}"?`)) {
+                          deleteMutation.mutate(post.id);
                         }
                       }}
-                      data-testid={`button-delete-${poem.slug}`}
+                      data-testid={`button-delete-${post.slug}`}
                     >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>
@@ -261,7 +232,7 @@ export default function AdminPoems() {
                 ))}
               </div>
             ) : (
-              <p className="text-muted-foreground">No poems yet. Create your first poem!</p>
+              <p className="text-muted-foreground">No journal posts yet. Create your first post!</p>
             )}
           </CardContent>
         </Card>

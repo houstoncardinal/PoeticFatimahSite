@@ -17,6 +17,7 @@ export interface IStorage {
   getAllCollections(): Promise<Collection[]>;
   getCollectionBySlug(slug: string): Promise<Collection | undefined>;
   createCollection(collection: InsertCollection): Promise<Collection>;
+  deleteCollection(id: string): Promise<void>;
 
   // Poems
   getAllPoems(): Promise<Poem[]>;
@@ -32,6 +33,7 @@ export interface IStorage {
   getUpcomingEvents(): Promise<Event[]>;
   getPastEvents(): Promise<Event[]>;
   createEvent(event: InsertEvent): Promise<Event>;
+  deleteEvent(id: string): Promise<void>;
 
   // Testimonials
   getAllTestimonials(): Promise<Testimonial[]>;
@@ -41,12 +43,14 @@ export interface IStorage {
   getAllProducts(): Promise<Product[]>;
   getFeaturedProducts(): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
+  deleteProduct(id: string): Promise<void>;
 
   // Journal Posts
   getAllJournalPosts(): Promise<JournalPost[]>;
   getJournalPostBySlug(slug: string): Promise<JournalPost | undefined>;
   getJournalPostsByCategory(category: string): Promise<JournalPost[]>;
   createJournalPost(post: InsertJournalPost): Promise<JournalPost>;
+  deleteJournalPost(id: string): Promise<void>;
 
   // Newsletter
   subscribeToNewsletter(subscription: InsertNewsletterSubscription): Promise<NewsletterSubscription>;
@@ -454,6 +458,10 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
+  async deleteCollection(id: string): Promise<void> {
+    await db.delete(collections).where(eq(collections.id, id));
+  }
+
   // Poems
   async getAllPoems(): Promise<Poem[]> {
     return db.select().from(poems).orderBy(desc(poems.createdAt));
@@ -507,6 +515,10 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
+  async deleteEvent(id: string): Promise<void> {
+    await db.delete(events).where(eq(events.id, id));
+  }
+
   // Testimonials
   async getAllTestimonials(): Promise<Testimonial[]> {
     return db.select().from(testimonials).orderBy(desc(testimonials.createdAt));
@@ -531,6 +543,10 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
+  async deleteProduct(id: string): Promise<void> {
+    await db.delete(products).where(eq(products.id, id));
+  }
+
   // Journal Posts
   async getAllJournalPosts(): Promise<JournalPost[]> {
     return db.select().from(journalPosts).orderBy(desc(journalPosts.createdAt));
@@ -548,6 +564,10 @@ export class DbStorage implements IStorage {
   async createJournalPost(insertPost: InsertJournalPost): Promise<JournalPost> {
     const result = await db.insert(journalPosts).values(insertPost).returning();
     return result[0];
+  }
+
+  async deleteJournalPost(id: string): Promise<void> {
+    await db.delete(journalPosts).where(eq(journalPosts.id, id));
   }
 
   // Newsletter

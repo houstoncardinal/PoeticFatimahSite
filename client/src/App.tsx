@@ -21,6 +21,11 @@ import Links from "@/pages/Links";
 import AdminLogin from "@/pages/AdminLogin";
 import Admin from "@/pages/Admin";
 import AdminPoems from "@/pages/AdminPoems";
+import AdminCollections from "@/pages/AdminCollections";
+import AdminEvents from "@/pages/AdminEvents";
+import AdminProducts from "@/pages/AdminProducts";
+import AdminJournal from "@/pages/AdminJournal";
+import AdminNewsletter from "@/pages/AdminNewsletter";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -41,6 +46,11 @@ function Router() {
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={Admin} />
       <Route path="/admin/poems" component={AdminPoems} />
+      <Route path="/admin/collections" component={AdminCollections} />
+      <Route path="/admin/events" component={AdminEvents} />
+      <Route path="/admin/products" component={AdminProducts} />
+      <Route path="/admin/journal" component={AdminJournal} />
+      <Route path="/admin/newsletter" component={AdminNewsletter} />
       <Route component={NotFound} />
     </Switch>
   );

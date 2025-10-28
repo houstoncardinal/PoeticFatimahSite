@@ -58,6 +58,11 @@ export const events = pgTable("events", {
 export const insertEventSchema = createInsertSchema(events).omit({
   id: true,
   createdAt: true,
+  isPast: true,
+}).extend({
+  date: z.union([z.string(), z.date()]).transform((val) => 
+    typeof val === 'string' ? new Date(val) : val
+  ),
 });
 
 export type InsertEvent = z.infer<typeof insertEventSchema>;
