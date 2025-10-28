@@ -24,6 +24,8 @@ export interface IStorage {
   getPoemBySlug(slug: string): Promise<Poem | undefined>;
   getSpotlightPoem(): Promise<Poem | undefined>;
   createPoem(poem: InsertPoem): Promise<Poem>;
+  updatePoem(id: string, poem: Partial<InsertPoem>): Promise<Poem>;
+  deletePoem(id: string): Promise<void>;
 
   // Events
   getAllEvents(): Promise<Event[]>;
@@ -474,6 +476,15 @@ export class DbStorage implements IStorage {
   async createPoem(insertPoem: InsertPoem): Promise<Poem> {
     const result = await db.insert(poems).values(insertPoem).returning();
     return result[0];
+  }
+
+  async updatePoem(id: string, updateData: Partial<InsertPoem>): Promise<Poem> {
+    const result = await db.update(poems).set(updateData).where(eq(poems.id, id)).returning();
+    return result[0];
+  }
+
+  async deletePoem(id: string): Promise<void> {
+    await db.delete(poems).where(eq(poems.id, id));
   }
 
   // Events

@@ -20,6 +20,7 @@ import JournalPost from "@/pages/JournalPost";
 import Links from "@/pages/Links";
 import AdminLogin from "@/pages/AdminLogin";
 import Admin from "@/pages/Admin";
+import AdminPoems from "@/pages/AdminPoems";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/links" component={Links} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={Admin} />
+      <Route path="/admin/poems" component={AdminPoems} />
       <Route component={NotFound} />
     </Switch>
   );

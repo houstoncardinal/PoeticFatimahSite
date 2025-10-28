@@ -2,7 +2,9 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { ObjectStorageService } from "./objectStorage";
-import { insertNewsletterSubscriptionSchema } from "@shared/schema";
+import { insertNewsletterSubscriptionSchema, insertPoemSchema } from "@shared/schema";
+import { requireAuth } from "./auth";
+import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Object Storage - Public assets serving
@@ -85,6 +87,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(poem);
     } catch (error) {
       console.error("Error fetching poem:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.post("/api/poems", requireAuth, async (req, res) => {
+    try {
+      const validated = insertPoemSchema.parse(req.body);
+      const poem = await storage.createPoem(validated);
+      res.json(poem);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation error", details: error.errors });
+      }
+      console.error("Error creating poem:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/poems/:id", requireAuth, async (req, res) => {
+    try {
+      await storage.deletePoem(req.params.id);
+      res.json({ success: true });
+    } catch (error) {
+      console.error("Error deleting poem:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
