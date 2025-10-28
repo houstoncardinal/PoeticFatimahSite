@@ -6,8 +6,11 @@ import {
   type Product, type InsertProduct,
   type JournalPost, type InsertJournalPost,
   type NewsletterSubscription, type InsertNewsletterSubscription,
+  collections, poems, events, testimonials, products, journalPosts, newsletterSubscriptions,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { eq, desc, lt, gte, sql as drizzleSql } from "drizzle-orm";
 
 export interface IStorage {
   // Collections
@@ -433,4 +436,125 @@ The muse doesn't reward those who wait for inspiration. She rewards those who sh
   }
 }
 
-export const storage = new MemStorage();
+export class DbStorage implements IStorage {
+  // Collections
+  async getAllCollections(): Promise<Collection[]> {
+    return db.select().from(collections).orderBy(desc(collections.createdAt));
+  }
+
+  async getCollectionBySlug(slug: string): Promise<Collection | undefined> {
+    const result = await db.select().from(collections).where(eq(collections.slug, slug)).limit(1);
+    return result[0];
+  }
+
+  async createCollection(insertCollection: InsertCollection): Promise<Collection> {
+    const result = await db.insert(collections).values(insertCollection).returning();
+    return result[0];
+  }
+
+  // Poems
+  async getAllPoems(): Promise<Poem[]> {
+    return db.select().from(poems).orderBy(desc(poems.createdAt));
+  }
+
+  async getPoemsByCollectionId(collectionId: string): Promise<Poem[]> {
+    return db.select().from(poems).where(eq(poems.collectionId, collectionId)).orderBy(desc(poems.createdAt));
+  }
+
+  async getPoemBySlug(slug: string): Promise<Poem | undefined> {
+    const result = await db.select().from(poems).where(eq(poems.slug, slug)).limit(1);
+    return result[0];
+  }
+
+  async getSpotlightPoem(): Promise<Poem | undefined> {
+    const result = await db.select().from(poems).orderBy(desc(poems.createdAt)).limit(1);
+    return result[0];
+  }
+
+  async createPoem(insertPoem: InsertPoem): Promise<Poem> {
+    const result = await db.insert(poems).values(insertPoem).returning();
+    return result[0];
+  }
+
+  // Events
+  async getAllEvents(): Promise<Event[]> {
+    return db.select().from(events).orderBy(events.date);
+  }
+
+  async getUpcomingEvents(): Promise<Event[]> {
+    const now = new Date();
+    return db.select().from(events).where(gte(events.date, now)).orderBy(events.date);
+  }
+
+  async getPastEvents(): Promise<Event[]> {
+    const now = new Date();
+    return db.select().from(events).where(lt(events.date, now)).orderBy(desc(events.date));
+  }
+
+  async createEvent(insertEvent: InsertEvent): Promise<Event> {
+    const result = await db.insert(events).values(insertEvent).returning();
+    return result[0];
+  }
+
+  // Testimonials
+  async getAllTestimonials(): Promise<Testimonial[]> {
+    return db.select().from(testimonials).orderBy(desc(testimonials.createdAt));
+  }
+
+  async createTestimonial(insertTestimonial: InsertTestimonial): Promise<Testimonial> {
+    const result = await db.insert(testimonials).values(insertTestimonial).returning();
+    return result[0];
+  }
+
+  // Products
+  async getAllProducts(): Promise<Product[]> {
+    return db.select().from(products).orderBy(desc(products.createdAt));
+  }
+
+  async getFeaturedProducts(): Promise<Product[]> {
+    return db.select().from(products).orderBy(desc(products.createdAt)).limit(3);
+  }
+
+  async createProduct(insertProduct: InsertProduct): Promise<Product> {
+    const result = await db.insert(products).values(insertProduct).returning();
+    return result[0];
+  }
+
+  // Journal Posts
+  async getAllJournalPosts(): Promise<JournalPost[]> {
+    return db.select().from(journalPosts).orderBy(desc(journalPosts.createdAt));
+  }
+
+  async getJournalPostBySlug(slug: string): Promise<JournalPost | undefined> {
+    const result = await db.select().from(journalPosts).where(eq(journalPosts.slug, slug)).limit(1);
+    return result[0];
+  }
+
+  async getJournalPostsByCategory(category: string): Promise<JournalPost[]> {
+    return db.select().from(journalPosts).where(eq(journalPosts.category, category)).orderBy(desc(journalPosts.createdAt));
+  }
+
+  async createJournalPost(insertPost: InsertJournalPost): Promise<JournalPost> {
+    const result = await db.insert(journalPosts).values(insertPost).returning();
+    return result[0];
+  }
+
+  // Newsletter
+  async subscribeToNewsletter(insertSubscription: InsertNewsletterSubscription): Promise<NewsletterSubscription> {
+    try {
+      const result = await db.insert(newsletterSubscriptions).values(insertSubscription).returning();
+      return result[0];
+    } catch (error: any) {
+      if (error?.code === '23505') {
+        throw new Error("Email already subscribed");
+      }
+      throw error;
+    }
+  }
+
+  async getNewsletterSubscriptions(): Promise<NewsletterSubscription[]> {
+    return db.select().from(newsletterSubscriptions).orderBy(desc(newsletterSubscriptions.createdAt));
+  }
+}
+
+export const storage = new DbStorage();
