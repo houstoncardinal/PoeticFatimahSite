@@ -3,6 +3,7 @@ import { neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { setupAuth } from "./auth";
 
 // Configure WebSocket for Neon serverless
 neonConfig.webSocketConstructor = ws;
@@ -14,12 +15,17 @@ declare module 'http' {
     rawBody: unknown
   }
 }
+
+// Body parsers must come before authentication
 app.use(express.json({
   verify: (req, _res, buf) => {
     req.rawBody = buf;
   }
 }));
 app.use(express.urlencoded({ extended: false }));
+
+// Setup authentication after body parsers
+setupAuth(app);
 
 app.use((req, res, next) => {
   const start = Date.now();
