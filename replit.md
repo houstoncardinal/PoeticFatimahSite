@@ -8,6 +8,25 @@ A high-end personal brand website for poet and performer Fatimah, showcasing poe
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes (October 2025)
+
+**Database Migration:**
+- Migrated from in-memory storage to PostgreSQL with Neon serverless
+- All content now persists across server restarts
+- Implemented DbStorage class using Drizzle ORM
+
+**Admin Authentication:**
+- Passport.js local strategy for secure admin login
+- Session-based authentication with express-session
+- Default admin credentials: username=admin, password=admin123
+- Protected admin routes with requireAuth middleware
+
+**Admin Dashboard:**
+- Admin portal at /admin with authentication required
+- Dashboard shows navigation to manage: Collections, Poems, Events, Products, Journal, Newsletter
+- Logout functionality
+- Built with role-based access control foundation
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -69,11 +88,13 @@ Preferred communication style: Simple, everyday language.
 - Products: Shop items with pricing and inventory
 - Journal Posts: Blog-style content with categories
 - Newsletter Subscriptions: Email capture for mailing list
+- Admin Users: Authentication credentials with bcrypt password hashing
 
 **Storage Pattern**
 - IStorage interface defines all data operations
-- Current implementation uses in-memory storage
-- Designed for easy migration to database-backed storage
+- DbStorage implementation using Drizzle ORM with PostgreSQL
+- All data persists in Neon serverless PostgreSQL database
+- Seed script available at server/seed.ts
 - All schema types are Zod-validated for runtime safety
 
 ### External Dependencies

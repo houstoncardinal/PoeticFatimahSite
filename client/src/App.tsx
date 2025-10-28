@@ -19,6 +19,7 @@ import Journal from "@/pages/Journal";
 import JournalPost from "@/pages/JournalPost";
 import Links from "@/pages/Links";
 import AdminLogin from "@/pages/AdminLogin";
+import Admin from "@/pages/Admin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -37,6 +38,7 @@ function Router() {
       <Route path="/journal/:slug" component={JournalPost} />
       <Route path="/links" component={Links} />
       <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin" component={Admin} />
       <Route component={NotFound} />
     </Switch>
   );
