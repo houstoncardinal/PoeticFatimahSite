@@ -82,6 +82,9 @@ export function Footer() {
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Poetically Fatimah. Made with love and late-night lines.
           </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            <Link href="/admin" className="hover:text-foreground transition-colors" data-testid="link-admin">Admin</Link>
+          </p>
         </div>
       </div>
     </footer>
