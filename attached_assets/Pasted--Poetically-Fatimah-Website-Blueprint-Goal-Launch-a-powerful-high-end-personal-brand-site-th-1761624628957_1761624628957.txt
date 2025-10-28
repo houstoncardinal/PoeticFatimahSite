@@ -1,0 +1,368 @@
+# Poetically Fatimah — Website Blueprint
+
+> Goal: Launch a powerful, high‑end personal brand site that showcases Fatimah’s poetry, voice, events, and products, while capturing emails, bookings, and sales.
+
+---
+
+## 1) Brand Foundation
+
+**Brand essence:** Soulful, empowering, reflective, healing, bold.
+
+**Voice & tone:** Intimate, poetic, confident, warm. Short melodic lines, sensory phrasing, grounded calls‑to‑action.
+
+**Audience:** Poetry lovers, event organizers, educators, brand collabs, podcast hosts, female empowerment & wellness communities.
+
+**One‑line value prop:** “Poetry that heals, words that move rooms, and performances that stay with you.”
+
+**Tagline ideas:**
+
+* “Where words find their wings.”
+* “Poetry you can feel.”
+* “Soft power. Strong voice.”
+
+**Color palette (suggested):**
+
+* Obsidian Black (#0E0E10)
+* Porcelain White (#FAFAFA)
+* Rose Gold (#B76E79)
+* Deep Plum (#4C2A4E)
+* Soft Sand (#E8DCCB)
+
+**Type system:**
+
+* Display: **Playfair Display** or **Cormorant Garamond** (elegant, editorial)
+* Body/UI: **Inter** or **General Sans** (modern, accessible)
+
+**Imagery art‑direction:** Cinematic portraits, soft natural light, warm grain, minimal clutter. Handwritten accents (SVG brush strokes). B‑roll: hands writing, stage silhouettes, pages turning.
+
+---
+
+## 2) Site Architecture (Sitemap)
+
+1. **Home** (Hero, highlight poem, performance reel, newsletter, CTAs)
+2. **Poetry** (Collections + single poem pages; audio read‑aloud)
+3. **Performances** (Reel, past shows, speaker packet/EPK, booking CTA)
+4. **Shop** (Books, prints, digital downloads, limited merch)
+5. **Events** (Calendar + RSVP/subscribe)
+6. **About** (Artist bio, mission, press kit)
+7. **Contact / Booking** (Form + email capture; press & collab)
+8. **Journal** (short posts: behind‑the‑scenes, drafts, reflections)
+
+*Utility:* Privacy, Terms, 404 (with poem fragment), Link-in-bio page.
+
+---
+
+## 3) Home Page — Wireframe & Copy (Draft)
+
+**Hero**
+
+* Headline A: *Poetry that you don’t just read — you feel.*
+* Headline B: *Soft power, spoken boldly.*
+* Headline C: *Letters that linger. A voice that stays.*
+* Subhead: “I’m Fatimah — writer, performer, and curator of moments that heal.”
+* CTAs: **Listen to a Poem** (primary), **Book a Performance** (secondary)
+* Social row: IG, YouTube/Shorts, TikTok, Spotify/Apple (spoken word), Newsletter
+
+**Spotlight Poem**
+
+> Small excerpt (4–6 lines) + “Play audio” button. Link: *Read the full piece →*
+
+**Performance Reel**
+
+* 60–90s embedded video. Mini-stats (cities, audiences, stages).
+* CTA: **View Performances** | **Download EPK** | **Book Me**
+
+**Latest Drops** (Shop)
+
+* 3 cards: Book/Chapbook, Print, Digital download. CTA: **Shop All**
+
+**Newsletter Band**
+
+* “Get first reads, show dates & quiet notes.” [Email field + Subscribe]
+
+**Testimonials**
+
+* 2–3 quotes (organizers/readers). CTA: **See More**
+
+**Footer**
+
+* Quick links + email + IG feed (cached) + rights.
+
+---
+
+## 4) Poetry Section (Structure & UX)
+
+* Collections grid (e.g., *Healing*, *Becoming*, *City Light*, *Letters to Self*).
+* Within each collection: poem cards → single poem page.
+* Single poem page: title, body, audio player (Fatimah voiceover), share, related.
+* Optional: “Director’s notes” (short commentary) + “Buy a print.”
+
+**Poem page micro‑copy (template):**
+
+* Meta title: “{Poem Title} — Poetically Fatimah”
+* Meta desc: “A spoken‑word piece by Fatimah exploring {theme}. Read, listen, and share.”
+
+---
+
+## 5) Performances / EPK
+
+**Reel at top**, then sections:
+
+* **What I Do:** Keynotes, spoken word sets (5–20 mins), workshops, residencies.
+* **Topics/Themes:** Healing, identity, love, womanhood, faith, resilience.
+* **Stage Tech:** Mic preference, monitors, playback, stage map (download PDF).
+* **Highlights:** Festivals, colleges, community orgs, brand collabs (logos).
+* **EPK:** Download one‑pager (bio, links, contact, rider).
+* **Booking CTA:** “Invite Fatimah to your stage.” (Form)
+
+**Booking form fields:** Name, Org, City, Date, Budget range, Audience size, Notes.
+
+---
+
+## 6) Shop Setup (Fast Path)
+
+* **Platform options:**
+
+  * *Gumroad* (fast digital + physical)
+  * *Payhip* (tax/VAT + memberships)
+  * *Shopify Lite* Buy Buttons (embed products site‑wide)
+* Accept Stripe + PayPal. Digital downloads for audio/poem PDFs.
+* Bundles: “Read + Listen” (poem PDF + audio), Signed Print preorders.
+
+**Product card copy (template):**
+
+* Title: *Letters That Linger* — Limited Print
+* Blurb: “A 10×14 archival print of the poem that won’t leave you.”
+* Details: paper stock, edition size, signature, ship window.
+
+---
+
+## 7) About (Bio Draft)
+
+“Fatimah is a poet and performer whose work lives at the intersection of softness and strength. Her pieces explore healing, identity, and the quiet courage it takes to love out loud. On stage, she weaves breath, cadence, and silence into something that feels like a hand held. Off stage, she builds community—through workshops, intimate readings, and collaborations that center voice and vulnerability.”
+
+**Short press bio (75–100 words)** and **long bio (300–400 words)** versions for media.
+
+---
+
+## 8) Journal (Content System)
+
+* Short reflective posts (200–600 words), audio snippets, drafts.
+* Categories: Behind the poem, On stage, On craft, Notes to self.
+* CTA block after each post → *Subscribe* + *Shop the poem*.
+
+---
+
+## 9) Contact & Collabs
+
+* **General inquiries** (simple form)
+* **Press/Media** (email + EPK)
+* **Workshops** (curriculum samples + educational outcomes)
+* **Brand Collabs** (past partners, guidelines, deliverables)
+
+---
+
+## 10) Link‑in‑Bio Page
+
+Minimal grid of buttons with analytics. Top 6:
+
+1. New poem 🎧
+2. Book me 🎤
+3. Shop prints 🛍️
+4. Join the list ✉️
+5. Events 📅
+6. Full site ⟶
+
+---
+
+## 11) Accessibility & Performance
+
+* Large contrast, 16–18px base, 1.6–1.8 line-height.
+* Keyboard focus states, aria‑labels on audio players, transcripts for reels.
+* Lazy‑load media; serve WebP; preconnect fonts; cache IG feed server‑side.
+
+---
+
+## 12) Integrations
+
+* **Email**: ConvertKit or Beehiiv (lead magnet: “7 Poems to Keep Close”).
+* **Analytics**: Plausible or GA4; Hotjar for heatmaps (first month only).
+* **Forms**: Tally or Typeform → email + Notion/Airtable sync.
+* **CMS**: Notion (fast) or Sanity (scalable).
+* **Search**: Algolia Lite or client‑side Fuse.js (for poems).
+
+---
+
+## 13) SEO & Social
+
+**Core keywords:** poet, spoken word, women’s poetry, [city] poet, book a poet, healing poetry.
+
+**Metadata templates**
+
+* Title: “{Page Title} — Poetically Fatimah”
+* Description: “Poetry, performances, and prints by Fatimah. Book shows, read new work, and join the list.”
+* OpenGraph: big photo (1200×630), title = page title, desc = above.
+* Twitter Card: summary_large_image.
+
+**Schema (JSON‑LD templates)**
+
+* `Person`, `CreativeWork` for poems, `Event` for shows, `Product` for prints.
+
+---
+
+## 14) Content You Can Paste In (Starter Drafts)
+
+**Hero subhead (3 options)**
+
+1. “Poems that feel like a deep breath.”
+2. “Soft is not small. It’s powerful.”
+3. “A page, a stage, a prayer.”
+
+**Newsletter lead magnet copy**
+“Join my quiet corner of the internet. First reads, new dates, and words I only send here.”
+
+**EPK one‑liner**
+“Spoken word artist blending intimacy and impact. Available for keynotes, sets, and workshops.”
+
+**Footer note**
+“© Poetically Fatimah. Made with love and late‑night lines.”
+
+---
+
+## 15) Visual Components (Design System)
+
+* Buttons: Primary (filled rose‑gold), Secondary (outline plum), Text link.
+* Cards: Image top, title, 1–2 line blurb, CTA chevron.
+* Audio Player: big play/pause, scrub bar, transcript toggle.
+* Quote Block: oversized quotes, subtle background texture.
+* Divider: hairline + tiny star glyph.
+
+---
+
+## 16) Tech Stack Options
+
+**Fast MVP (no code/low code):**
+
+* Framer/Lovable for pages + Gumroad embeds + Tally forms + ConvertKit.
+
+**Mid (React):**
+
+* Next.js + Tailwind + Sanity + Shopify Lite + UploadThing for audio.
+
+**Performance pack:** SSR, image optimization, sitemap.xml, robots.txt, prefetch routes.
+
+---
+
+## 17) Build Plan (2‑Week Sprint)
+
+**Day 1–2:** Brand kit lock + copy polish + assets (5 hero photos, 1 reel)
+**Day 3–5:** Home, Poetry, About
+**Day 6–7:** Performances + EPK + Contact/Booking
+**Day 8–9:** Shop + products + payments
+**Day 10–11:** Events + Journal
+**Day 12:** Accessibility + SEO + schema + speed pass
+**Day 13:** Staging review + fixes
+**Day 14:** Launch + announce + submit to Google Search Console
+
+---
+
+## 18) Lovable.dev Build Prompt (Paste‑Ready)
+
+**Title:** Poetically Fatimah — Premium Poetry & Performance Site
+
+**High‑level brief:**
+Build a sleek, editorial‑grade website for a poet/performer named Fatimah (brand: “Poetically Fatimah”). Prioritize fast load, accessibility, elegant typography, and cinematic imagery. Pages: Home, Poetry (collections + single poem), Performances/EPK, Shop (embed), Events, About, Journal, Contact/Booking, Link‑in‑bio. Integrations: ConvertKit, Gumroad/Shopify Lite, Tally forms, Plausible analytics. Include JSON‑LD for Person, CreativeWork (poems), Event, and Product when applicable.
+
+**Functional requirements:**
+
+* Global header/footer, mobile nav drawer.
+* Home hero with 3 headline variants + subhead + dual CTAs.
+* Spotlight Poem component with audio player + transcript toggle.
+* Performances page with embedded reel, topic tags, EPK download.
+* Shop page using embeds (Gumroad or Shopify Lite buttons).
+* Events page with simple CMS (title, date, city, link) and past events archive.
+* Poetry collections grid; single poem page with audio upload + transcript field.
+* Newsletter signup (ConvertKit API) with success state + double opt‑in text.
+* Contact/Booking form (Tally/Typeform embed) and a plain email fallback.
+* Link‑in‑bio page with buttons and simple analytics.
+* SEO basics (meta tags, OpenGraph), sitemap.xml, robots.txt.
+* Accessibility pass (aria, focus states, sufficient contrast).
+
+**Design direction:**
+
+* Palette: Obsidian/Porcelain/Rose‑Gold/Plum/Sand; lots of whitespace; oversized quotes.
+* Typography: Playfair Display for headlines, Inter for body.
+* Components: Cards, large audio player, quote blocks, soft shadows, 2xl radius.
+* Micro‑animations on hover/scroll; lazy‑load images/video; subtle grain texture.
+
+**CMS schema:**
+
+* Poem: {title, slug, body (rich text), audioUrl, collection, themes[], excerpt, createdAt}
+* Collection: {title, slug, description}
+* Event: {title, date, city, venue, link, isPast}
+* Testimonial: {quote, name, role, source}
+* ProductStub: {title, blurb, priceText, buyUrl, image}
+
+**Deliverables:**
+
+* Fully responsive site with the above pages and components.
+* Admin-friendly CMS or content JSON files for quick edits.
+* Deploy on Vercel/Netlify with environment variables for APIs.
+
+---
+
+## 19) EPK One‑Pager (Content for PDF)
+
+* Name: **Fatimah (Poetically Fatimah)**
+* Short bio (100 words)
+* Topics: Healing, Identity, Love, Faith, Resilience
+* Formats: Keynotes, 5–20 min sets, Workshops
+* Tech needs: 1 handheld/wireless mic, playback (3.5mm/BT), stool, water
+* Links: Site, IG, YouTube/Shorts, Email
+* Contact: booking@{domain}.com | +1 (xxx) xxx‑xxxx
+
+---
+
+## 20) Domain & Handles
+
+* poeticallyfatimah.com (preferred)
+* poetfatimah.com
+* wordsbyfatimah.com
+
+---
+
+## 21) Launch Checklist
+
+* [ ] DNS & SSL live
+* [ ] Meta + OG tags verified
+* [ ] JSON‑LD validates in Rich Results
+* [ ] Email signup test (double opt‑in)
+* [ ] Forms test (booking + contact)
+* [ ] Shop test purchases
+* [ ] 404 styled with a poem line
+* [ ] Submit sitemap to GSC
+* [ ] Announce on socials (carousels + reel)
+
+---
+
+## 22) Optional Add‑Ons
+
+* Audio‑only podcast feed for poems (via RSS)
+* Members tier: “First Reads Club” (exclusive drafts, monthly livestream)
+* Workshop curriculum PDF set (teachers/organizers)
+* Print store drops with edition counters
+
+---
+
+## 23) Content Intake List
+
+* 6–10 high‑res portraits
+* 1 performance reel (vertical + horizontal)
+* 12–20 poems (ready to publish) + audio recordings
+* 3 testimonials (organizers/readers)
+* Shop product photos/mockups
+* Event list (past & upcoming)
+
+---
+
+**Next step:** Choose hero headline + finalize palette; I’ll turn this into a live landing page mock and wire up CMS + email.
