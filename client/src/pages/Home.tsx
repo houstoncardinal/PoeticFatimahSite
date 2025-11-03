@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Poem, Testimonial, Product } from "@shared/schema";
+import type { Poem, Product, Event } from "@shared/schema";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { SEOHead } from "@/components/SEOHead";
 import InstagramFeed from "@/components/InstagramFeed";
@@ -28,8 +28,8 @@ export default function Home() {
     queryKey: ["/api/poems/spotlight"],
   });
 
-  const { data: testimonials, isLoading: testimonialsLoading } = useQuery<Testimonial[]>({
-    queryKey: ["/api/testimonials"],
+  const { data: events, isLoading: eventsLoading } = useQuery<Event[]>({
+    queryKey: ["/api/events"],
   });
 
   const { data: products, isLoading: productsLoading } = useQuery<Product[]>({
@@ -263,31 +263,117 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      {!testimonialsLoading && testimonials && testimonials.length > 0 && (
-        <section className="py-24 bg-background">
-          <div className="container mx-auto px-6 max-w-6xl">
-            <h2 className="font-serif text-4xl md:text-5xl font-bold text-center mb-16">Kind Words</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {testimonials.slice(0, 2).map((testimonial) => (
-                <Card key={testimonial.id} className="p-8" data-testid={`card-testimonial-${testimonial.id}`}>
-                  <div className="text-6xl text-primary mb-4 font-serif">"</div>
-                  <p className="text-lg leading-relaxed mb-6 italic" data-testid={`text-testimonial-quote-${testimonial.id}`}>
-                    {testimonial.quote}
-                  </p>
-                  <div className="border-t pt-4">
-                    <p className="font-semibold" data-testid={`text-testimonial-name-${testimonial.id}`}>{testimonial.name}</p>
-                    {testimonial.role && (
-                      <p className="text-sm text-muted-foreground" data-testid={`text-testimonial-role-${testimonial.id}`}>{testimonial.role}</p>
-                    )}
+      {/* Events Section - Intelligent Upcoming/Past Categorization */}
+      {!eventsLoading && events && events.length > 0 && (() => {
+        const now = new Date();
+        const upcomingEvents = events.filter(e => new Date(e.date) >= now).sort((a, b) => 
+          new Date(a.date).getTime() - new Date(b.date).getTime()
+        );
+        const pastEvents = events.filter(e => new Date(e.date) < now).sort((a, b) => 
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        return (
+          <section className="py-24 bg-background">
+            <div className="container mx-auto px-6 max-w-6xl">
+              <div className="text-center mb-16">
+                <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">Where You Can Find Me</h2>
+                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                  Performances, workshops, and conversations across the country. Book me for your next event.
+                </p>
+              </div>
+
+              {/* Upcoming Events */}
+              {upcomingEvents.length > 0 && (
+                <div className="mb-16">
+                  <h3 className="font-serif text-2xl font-bold mb-8 flex items-center gap-2">
+                    <span className="h-2 w-2 bg-primary rounded-full animate-pulse"></span>
+                    Upcoming
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {upcomingEvents.slice(0, 4).map((event) => (
+                      <Card key={event.id} className="hover-elevate overflow-hidden" data-testid={`card-event-${event.id}`}>
+                        <CardHeader className="pb-3">
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="flex-1">
+                              <CardTitle className="font-serif text-xl mb-2" data-testid={`text-event-title-${event.id}`}>
+                                {event.title}
+                              </CardTitle>
+                              <p className="text-sm text-muted-foreground" data-testid={`text-event-city-${event.id}`}>
+                                {event.city}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-semibold text-primary" data-testid={`text-event-date-${event.id}`}>
+                                {new Date(event.date).toLocaleDateString('en-US', { 
+                                  month: 'short', 
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          {event.venue && (
+                            <p className="text-sm text-muted-foreground mb-2" data-testid={`text-event-venue-${event.id}`}>
+                              📍 {event.venue}
+                            </p>
+                          )}
+                        </CardContent>
+                        {event.link && (
+                          <CardFooter>
+                            <Button asChild className="w-full" size="sm" data-testid={`button-event-details-${event.id}`}>
+                              <a href={event.link} target="_blank" rel="noopener noreferrer">
+                                Event Details
+                              </a>
+                            </Button>
+                          </CardFooter>
+                        )}
+                      </Card>
+                    ))}
                   </div>
-                </Card>
-              ))}
+                </div>
+              )}
+
+              {/* Past Events */}
+              {pastEvents.length > 0 && (
+                <div>
+                  <h3 className="font-serif text-2xl font-bold mb-8 text-muted-foreground">
+                    Past Performances
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {pastEvents.slice(0, 6).map((event) => (
+                      <Card key={event.id} className="hover-elevate" data-testid={`card-past-event-${event.id}`}>
+                        <CardHeader className="pb-2">
+                          <div className="text-xs text-muted-foreground mb-1" data-testid={`text-past-event-date-${event.id}`}>
+                            {new Date(event.date).toLocaleDateString('en-US', { 
+                              month: 'short', 
+                              year: 'numeric'
+                            })}
+                          </div>
+                          <CardTitle className="font-serif text-base" data-testid={`text-past-event-title-${event.id}`}>
+                            {event.title}
+                          </CardTitle>
+                          <p className="text-xs text-muted-foreground" data-testid={`text-past-event-city-${event.id}`}>
+                            {event.city}
+                          </p>
+                        </CardHeader>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="text-center mt-12">
+                <Button variant="outline" asChild data-testid="button-view-all-events">
+                  <Link href="/events">View All Events</Link>
+                </Button>
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        );
+      })()}
     </div>
   );
 }
