@@ -61,6 +61,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/collections/:id", requireAuth, async (req, res) => {
+    try {
+      const validated = insertCollectionSchema.partial().parse(req.body);
+      const collection = await storage.updateCollection(req.params.id, validated);
+      res.json(collection);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation error", details: error.errors });
+      }
+      console.error("Error updating collection:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   app.delete("/api/collections/:id", requireAuth, async (req, res) => {
     try {
       await storage.deleteCollection(req.params.id);
@@ -129,6 +143,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/poems/:id", requireAuth, async (req, res) => {
+    try {
+      const validated = insertPoemSchema.partial().parse(req.body);
+      const poem = await storage.updatePoem(req.params.id, validated);
+      res.json(poem);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation error", details: error.errors });
+      }
+      console.error("Error updating poem:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   app.delete("/api/poems/:id", requireAuth, async (req, res) => {
     try {
       await storage.deletePoem(req.params.id);
@@ -183,6 +211,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
       console.error("Error creating event:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.put("/api/events/:id", requireAuth, async (req, res) => {
+    try {
+      const validated = insertEventSchema.partial().parse(req.body);
+      const event = await storage.updateEvent(req.params.id, validated);
+      res.json(event);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation error", details: error.errors });
+      }
+      console.error("Error updating event:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -243,6 +285,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.put("/api/products/:id", requireAuth, async (req, res) => {
+    try {
+      const validated = insertProductSchema.partial().parse(req.body);
+      const product = await storage.updateProduct(req.params.id, validated);
+      res.json(product);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation error", details: error.errors });
+      }
+      console.error("Error updating product:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
   app.delete("/api/products/:id", requireAuth, async (req, res) => {
     try {
       await storage.deleteProduct(req.params.id);
@@ -294,6 +350,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ error: "Validation error", details: error.errors });
       }
       console.error("Error creating journal post:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  app.put("/api/journal/:id", requireAuth, async (req, res) => {
+    try {
+      const validated = insertJournalPostSchema.partial().parse(req.body);
+      const post = await storage.updateJournalPost(req.params.id, validated);
+      res.json(post);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ error: "Validation error", details: error.errors });
+      }
+      console.error("Error updating journal post:", error);
       res.status(500).json({ error: "Internal server error" });
     }
   });

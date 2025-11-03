@@ -17,6 +17,7 @@ export interface IStorage {
   getAllCollections(): Promise<Collection[]>;
   getCollectionBySlug(slug: string): Promise<Collection | undefined>;
   createCollection(collection: InsertCollection): Promise<Collection>;
+  updateCollection(id: string, collection: Partial<InsertCollection>): Promise<Collection>;
   deleteCollection(id: string): Promise<void>;
 
   // Poems
@@ -33,6 +34,7 @@ export interface IStorage {
   getUpcomingEvents(): Promise<Event[]>;
   getPastEvents(): Promise<Event[]>;
   createEvent(event: InsertEvent): Promise<Event>;
+  updateEvent(id: string, event: Partial<InsertEvent>): Promise<Event>;
   deleteEvent(id: string): Promise<void>;
 
   // Testimonials
@@ -43,6 +45,7 @@ export interface IStorage {
   getAllProducts(): Promise<Product[]>;
   getFeaturedProducts(): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
+  updateProduct(id: string, product: Partial<InsertProduct>): Promise<Product>;
   deleteProduct(id: string): Promise<void>;
 
   // Journal Posts
@@ -50,6 +53,7 @@ export interface IStorage {
   getJournalPostBySlug(slug: string): Promise<JournalPost | undefined>;
   getJournalPostsByCategory(category: string): Promise<JournalPost[]>;
   createJournalPost(post: InsertJournalPost): Promise<JournalPost>;
+  updateJournalPost(id: string, post: Partial<InsertJournalPost>): Promise<JournalPost>;
   deleteJournalPost(id: string): Promise<void>;
 
   // Newsletter
@@ -458,6 +462,11 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
+  async updateCollection(id: string, updateData: Partial<InsertCollection>): Promise<Collection> {
+    const result = await db.update(collections).set(updateData).where(eq(collections.id, id)).returning();
+    return result[0];
+  }
+
   async deleteCollection(id: string): Promise<void> {
     await db.delete(collections).where(eq(collections.id, id));
   }
@@ -515,6 +524,11 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
+  async updateEvent(id: string, updateData: Partial<InsertEvent>): Promise<Event> {
+    const result = await db.update(events).set(updateData).where(eq(events.id, id)).returning();
+    return result[0];
+  }
+
   async deleteEvent(id: string): Promise<void> {
     await db.delete(events).where(eq(events.id, id));
   }
@@ -543,6 +557,11 @@ export class DbStorage implements IStorage {
     return result[0];
   }
 
+  async updateProduct(id: string, updateData: Partial<InsertProduct>): Promise<Product> {
+    const result = await db.update(products).set(updateData).where(eq(products.id, id)).returning();
+    return result[0];
+  }
+
   async deleteProduct(id: string): Promise<void> {
     await db.delete(products).where(eq(products.id, id));
   }
@@ -563,6 +582,11 @@ export class DbStorage implements IStorage {
 
   async createJournalPost(insertPost: InsertJournalPost): Promise<JournalPost> {
     const result = await db.insert(journalPosts).values(insertPost).returning();
+    return result[0];
+  }
+
+  async updateJournalPost(id: string, updateData: Partial<InsertJournalPost>): Promise<JournalPost> {
+    const result = await db.update(journalPosts).set(updateData).where(eq(journalPosts.id, id)).returning();
     return result[0];
   }
 
