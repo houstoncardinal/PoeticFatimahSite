@@ -8,9 +8,19 @@ A high-end personal brand website for poet and performer Fatimah, showcasing poe
 
 Preferred communication style: Simple, everyday language.
 
-## Recent Changes (October 2025)
+## Recent Changes (November 2025)
 
-**Database Migration:**
+**Intelligent Events System (Latest):**
+- Removed testimonials section from homepage
+- Added powerful events section with smart date-based categorization
+- Events automatically categorized as "Upcoming" (future dates) or "Past Performances" (past dates)
+- Homepage displays up to 4 upcoming events and 6 past events
+- Redesigned Events page (/events) with hero section and improved UX
+- Client-side filtering and sorting ensures real-time accuracy
+- Pulsing indicator on upcoming events for visual emphasis
+- All event management via /admin/events interface
+
+**Database Migration (October 2025):**
 - Migrated from in-memory storage to PostgreSQL with Neon serverless
 - All content now persists across server restarts
 - Implemented DbStorage class using Drizzle ORM
@@ -58,11 +68,11 @@ Preferred communication style: Simple, everyday language.
 - Theme management with custom ThemeProvider (light/dark mode)
 
 **Key Pages**
-- Home: Hero section, spotlight poem, testimonials, newsletter signup
+- Home: Hero section, spotlight poem, intelligent events section (upcoming/past), Instagram feed, newsletter signup
 - Poetry: Collections grid and individual poem views with audio player
 - Performances: Video reel, topics, booking information
 - Shop: Product catalog with featured items
-- Events: Upcoming and past events calendar
+- Events: Hero section with "Where You Can Find Me" messaging, upcoming events with date badges, past performances grid
 - Journal: Blog-style posts with categories
 - About: Biography, mission, press kit
 - Contact: Multi-purpose contact forms for different inquiries
@@ -91,8 +101,7 @@ Preferred communication style: Simple, everyday language.
 **Database Schema**
 - Collections: Poetry collection groupings
 - Poems: Individual poems with audio, transcripts, themes
-- Events: Past and upcoming performances
-- Testimonials: Customer/audience testimonials
+- Events: Performances with date, city, venue, link (smart client-side categorization into upcoming/past)
 - Products: Shop items with pricing and inventory
 - Journal Posts: Blog-style content with categories
 - Newsletter Subscriptions: Email capture for mailing list
