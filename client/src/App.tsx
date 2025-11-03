@@ -18,6 +18,7 @@ import Contact from "@/pages/Contact";
 import Journal from "@/pages/Journal";
 import JournalPost from "@/pages/JournalPost";
 import Links from "@/pages/Links";
+import InstagramGallery from "@/pages/InstagramGallery";
 import AdminLogin from "@/pages/AdminLogin";
 import Admin from "@/pages/Admin";
 import AdminPoems from "@/pages/AdminPoems";
@@ -43,6 +44,7 @@ function Router() {
       <Route path="/journal" component={Journal} />
       <Route path="/journal/:slug" component={JournalPost} />
       <Route path="/links" component={Links} />
+      <Route path="/instagram" component={InstagramGallery} />
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={Admin} />
       <Route path="/admin/poems" component={AdminPoems} />

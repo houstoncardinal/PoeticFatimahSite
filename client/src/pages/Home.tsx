@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import type { Poem, Testimonial, Product } from "@shared/schema";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { SEOHead } from "@/components/SEOHead";
+import InstagramFeed from "@/components/InstagramFeed";
 
 const HERO_HEADLINES = [
   "Poetry that you don't just read — you feel.",
@@ -233,6 +234,9 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* Instagram Feed Section */}
+      <InstagramFeed />
 
       {/* Newsletter Section */}
       <section className="py-24 bg-accent" data-testid="section-newsletter">
