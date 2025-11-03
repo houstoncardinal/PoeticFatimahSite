@@ -75,16 +75,8 @@ export default function InstagramGallery() {
                 </ol>
               </div>
 
-              {/* Placeholder: Replace this comment with your Instagram widget embed code */}
-              {/* Example for Elfsight:
-              <div className="elfsight-app-[YOUR-APP-ID]"></div>
-              <script src="https://static.elfsight.com/platform/platform.js" data-use-service-core defer></script>
-              */}
-
-              {/* Example for EmbedSocial:
-              <div className='embedsocial-hashtag' data-ref='[YOUR-REF-ID]'></div>
-              <script>(function(d, s, id){var js; if (d.getElementById(id)) {return;} js = d.createElement(s); js.id = id; js.src = "https://embedsocial.com/cdn/ht.js"; d.getElementsByTagName("head")[0].appendChild(js);}(document, "script", "EmbedSocialHashtagScript"));</script>
-              */}
+              {/* Elfsight Instagram Feed Widget */}
+              <div className="elfsight-app-00ab40be-bcbf-4670-a0bd-d4b11781265b" data-elfsight-app-lazy></div>
             </Card>
 
             {/* Manual Grid Fallback - Can be populated with recent posts */}

@@ -33,11 +33,8 @@ export default function InstagramFeed() {
               </ol>
             </div>
             
-            {/* Placeholder: Replace this div with your Elfsight embed code */}
-            {/* 
-            <div className="elfsight-app-[YOUR-APP-ID]"></div>
-            <script src="https://static.elfsight.com/platform/platform.js" data-use-service-core defer></script>
-            */}
+            {/* Elfsight Instagram Feed Widget */}
+            <div className="elfsight-app-00ab40be-bcbf-4670-a0bd-d4b11781265b" data-elfsight-app-lazy></div>
           </Card>
         </div>
 
