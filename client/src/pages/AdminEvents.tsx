@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { Event } from "@shared/schema";
 import { format } from "date-fns";
@@ -16,6 +16,7 @@ export default function AdminEvents() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     date: "",
@@ -43,6 +44,26 @@ export default function AdminEvents() {
     },
     onError: () => {
       toast({ title: "Error creating event", variant: "destructive" });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const payload = {
+        ...data,
+        date: new Date(data.date).toISOString(),
+      };
+      return apiRequest("PUT", `/api/events/${id}`, payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/events"] });
+      toast({ title: "Event updated successfully" });
+      setIsDialogOpen(false);
+      setEditingEvent(null);
+      resetForm();
+    },
+    onError: () => {
+      toast({ title: "Error updating event", variant: "destructive" });
     },
   });
 
@@ -78,7 +99,27 @@ export default function AdminEvents() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    if (editingEvent) {
+      updateMutation.mutate({ id: editingEvent.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (event: Event) => {
+    setEditingEvent(event);
+    const eventDate = new Date(event.date);
+    const localDatetime = new Date(eventDate.getTime() - eventDate.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+    setFormData({
+      title: event.title,
+      date: localDatetime,
+      city: event.city,
+      venue: event.venue || "",
+      link: event.link || "",
+    });
+    setIsDialogOpen(true);
   };
 
   return (
@@ -92,7 +133,13 @@ export default function AdminEvents() {
             </Button>
             <h1 className="text-3xl font-serif font-bold">Manage Events</h1>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) {
+              setEditingEvent(null);
+              resetForm();
+            }
+          }}>
             <DialogTrigger asChild>
               <Button data-testid="button-create-event">
                 <Plus className="h-4 w-4 mr-2" />
@@ -101,8 +148,10 @@ export default function AdminEvents() {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Create New Event</DialogTitle>
-                <DialogDescription>Add a performance, workshop, or speaking engagement</DialogDescription>
+                <DialogTitle>{editingEvent ? "Edit Event" : "Create New Event"}</DialogTitle>
+                <DialogDescription>
+                  {editingEvent ? "Update event details" : "Add a performance, workshop, or speaking engagement"}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -159,10 +208,21 @@ export default function AdminEvents() {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit">
-                    {createMutation.isPending ? "Creating..." : "Create Event"}
+                  <Button 
+                    type="submit" 
+                    disabled={createMutation.isPending || updateMutation.isPending} 
+                    data-testid="button-submit"
+                  >
+                    {editingEvent 
+                      ? (updateMutation.isPending ? "Updating..." : "Update Event")
+                      : (createMutation.isPending ? "Creating..." : "Create Event")
+                    }
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setIsDialogOpen(false);
+                    setEditingEvent(null);
+                    resetForm();
+                  }}>
                     Cancel
                   </Button>
                 </div>
@@ -199,18 +259,28 @@ export default function AdminEvents() {
                         </a>
                       )}
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        if (confirm(`Delete "${event.title}"?`)) {
-                          deleteMutation.mutate(event.id);
-                        }
-                      }}
-                      data-testid={`button-delete-${event.id}`}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(event)}
+                        data-testid={`button-edit-${event.id}`}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (confirm(`Delete "${event.title}"?`)) {
+                            deleteMutation.mutate(event.id);
+                          }
+                        }}
+                        data-testid={`button-delete-${event.id}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>

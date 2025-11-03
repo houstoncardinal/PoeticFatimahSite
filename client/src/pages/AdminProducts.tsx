@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { ArrowLeft, Plus, Trash2, ExternalLink } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ExternalLink, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { Product } from "@shared/schema";
 
@@ -16,6 +16,7 @@ export default function AdminProducts() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     blurb: "",
@@ -38,6 +39,22 @@ export default function AdminProducts() {
     },
     onError: () => {
       toast({ title: "Error creating product", variant: "destructive" });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      return apiRequest("PUT", `/api/products/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+      toast({ title: "Product updated successfully" });
+      setIsDialogOpen(false);
+      setEditingProduct(null);
+      resetForm();
+    },
+    onError: () => {
+      toast({ title: "Error updating product", variant: "destructive" });
     },
   });
 
@@ -74,7 +91,24 @@ export default function AdminProducts() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    if (editingProduct) {
+      updateMutation.mutate({ id: editingProduct.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
+    setFormData({
+      title: product.title,
+      blurb: product.blurb,
+      priceText: product.priceText,
+      buyUrl: product.buyUrl,
+      imageUrl: product.imageUrl || "",
+      details: product.details || "",
+    });
+    setIsDialogOpen(true);
   };
 
   return (
@@ -88,7 +122,13 @@ export default function AdminProducts() {
             </Button>
             <h1 className="text-3xl font-serif font-bold">Manage Products</h1>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) {
+              setEditingProduct(null);
+              resetForm();
+            }
+          }}>
             <DialogTrigger asChild>
               <Button data-testid="button-create-product">
                 <Plus className="h-4 w-4 mr-2" />
@@ -97,8 +137,10 @@ export default function AdminProducts() {
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Create New Product</DialogTitle>
-                <DialogDescription>Add a book, print, or digital product to your shop</DialogDescription>
+                <DialogTitle>{editingProduct ? "Edit Product" : "Create New Product"}</DialogTitle>
+                <DialogDescription>
+                  {editingProduct ? "Update product details" : "Add a book, print, or digital product to your shop"}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -170,10 +212,21 @@ export default function AdminProducts() {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit">
-                    {createMutation.isPending ? "Creating..." : "Create Product"}
+                  <Button 
+                    type="submit" 
+                    disabled={createMutation.isPending || updateMutation.isPending} 
+                    data-testid="button-submit"
+                  >
+                    {editingProduct 
+                      ? (updateMutation.isPending ? "Updating..." : "Update Product")
+                      : (createMutation.isPending ? "Creating..." : "Create Product")
+                    }
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setIsDialogOpen(false);
+                    setEditingProduct(null);
+                    resetForm();
+                  }}>
                     Cancel
                   </Button>
                 </div>
@@ -199,18 +252,28 @@ export default function AdminProducts() {
                   >
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-semibold text-lg">{product.title}</h3>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => {
-                          if (confirm(`Delete "${product.title}"?`)) {
-                            deleteMutation.mutate(product.id);
-                          }
-                        }}
-                        data-testid={`button-delete-${product.id}`}
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(product)}
+                          data-testid={`button-edit-${product.id}`}
+                        >
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            if (confirm(`Delete "${product.title}"?`)) {
+                              deleteMutation.mutate(product.id);
+                            }
+                          }}
+                          data-testid={`button-delete-${product.id}`}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                     <p className="text-sm text-muted-foreground mb-2">{product.blurb}</p>
                     <p className="text-sm font-semibold text-primary mb-2">{product.priceText}</p>

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { Collection } from "@shared/schema";
 
@@ -16,6 +16,7 @@ export default function AdminCollections() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingCollection, setEditingCollection] = useState<Collection | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -35,6 +36,22 @@ export default function AdminCollections() {
     },
     onError: () => {
       toast({ title: "Error creating collection", variant: "destructive" });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      return apiRequest("PUT", `/api/collections/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/collections"] });
+      toast({ title: "Collection updated successfully" });
+      setIsDialogOpen(false);
+      setEditingCollection(null);
+      resetForm();
+    },
+    onError: () => {
+      toast({ title: "Error updating collection", variant: "destructive" });
     },
   });
 
@@ -64,7 +81,21 @@ export default function AdminCollections() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    if (editingCollection) {
+      updateMutation.mutate({ id: editingCollection.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (collection: Collection) => {
+    setEditingCollection(collection);
+    setFormData({
+      title: collection.title,
+      slug: collection.slug,
+      description: collection.description || "",
+    });
+    setIsDialogOpen(true);
   };
 
   const generateSlug = (title: string) => {
@@ -82,7 +113,13 @@ export default function AdminCollections() {
             </Button>
             <h1 className="text-3xl font-serif font-bold">Manage Collections</h1>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) {
+              setEditingCollection(null);
+              resetForm();
+            }
+          }}>
             <DialogTrigger asChild>
               <Button data-testid="button-create-collection">
                 <Plus className="h-4 w-4 mr-2" />
@@ -91,8 +128,10 @@ export default function AdminCollections() {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Create New Collection</DialogTitle>
-                <DialogDescription>Add a new poetry collection</DialogDescription>
+                <DialogTitle>{editingCollection ? "Edit Collection" : "Create New Collection"}</DialogTitle>
+                <DialogDescription>
+                  {editingCollection ? "Update collection details" : "Add a new poetry collection"}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -128,10 +167,21 @@ export default function AdminCollections() {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit">
-                    {createMutation.isPending ? "Creating..." : "Create Collection"}
+                  <Button 
+                    type="submit" 
+                    disabled={createMutation.isPending || updateMutation.isPending} 
+                    data-testid="button-submit"
+                  >
+                    {editingCollection 
+                      ? (updateMutation.isPending ? "Updating..." : "Update Collection")
+                      : (createMutation.isPending ? "Creating..." : "Create Collection")
+                    }
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setIsDialogOpen(false);
+                    setEditingCollection(null);
+                    resetForm();
+                  }}>
                     Cancel
                   </Button>
                 </div>
@@ -160,18 +210,28 @@ export default function AdminCollections() {
                       <p className="text-sm text-muted-foreground mt-1">{collection.description}</p>
                       <p className="text-xs text-muted-foreground mt-2">Slug: {collection.slug}</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        if (confirm(`Delete "${collection.title}"?`)) {
-                          deleteMutation.mutate(collection.id);
-                        }
-                      }}
-                      data-testid={`button-delete-${collection.slug}`}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(collection)}
+                        data-testid={`button-edit-${collection.slug}`}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (confirm(`Delete "${collection.title}"?`)) {
+                            deleteMutation.mutate(collection.id);
+                          }
+                        }}
+                        data-testid={`button-delete-${collection.slug}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>

@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { JournalPost } from "@shared/schema";
 
@@ -16,6 +16,7 @@ export default function AdminJournal() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingPost, setEditingPost] = useState<JournalPost | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -39,6 +40,22 @@ export default function AdminJournal() {
     },
     onError: () => {
       toast({ title: "Error creating journal post", variant: "destructive" });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      return apiRequest("PUT", `/api/journal/${id}`, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/journal"] });
+      toast({ title: "Journal post updated successfully" });
+      setIsDialogOpen(false);
+      setEditingPost(null);
+      resetForm();
+    },
+    onError: () => {
+      toast({ title: "Error updating journal post", variant: "destructive" });
     },
   });
 
@@ -76,7 +93,25 @@ export default function AdminJournal() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    if (editingPost) {
+      updateMutation.mutate({ id: editingPost.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (post: JournalPost) => {
+    setEditingPost(post);
+    setFormData({
+      title: post.title,
+      slug: post.slug,
+      body: post.body,
+      excerpt: post.excerpt || "",
+      category: post.category,
+      audioUrl: post.audioUrl || "",
+      imageUrl: post.imageUrl || "",
+    });
+    setIsDialogOpen(true);
   };
 
   const generateSlug = (title: string) => {
@@ -94,7 +129,13 @@ export default function AdminJournal() {
             </Button>
             <h1 className="text-3xl font-serif font-bold">Manage Journal</h1>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) {
+              setEditingPost(null);
+              resetForm();
+            }
+          }}>
             <DialogTrigger asChild>
               <Button data-testid="button-create-post">
                 <Plus className="h-4 w-4 mr-2" />
@@ -103,8 +144,10 @@ export default function AdminJournal() {
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Create New Journal Post</DialogTitle>
-                <DialogDescription>Add a blog post, reflection, or announcement</DialogDescription>
+                <DialogTitle>{editingPost ? "Edit Journal Post" : "Create New Journal Post"}</DialogTitle>
+                <DialogDescription>
+                  {editingPost ? "Update post details" : "Add a blog post, reflection, or announcement"}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -182,10 +225,21 @@ export default function AdminJournal() {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit">
-                    {createMutation.isPending ? "Creating..." : "Create Post"}
+                  <Button 
+                    type="submit" 
+                    disabled={createMutation.isPending || updateMutation.isPending} 
+                    data-testid="button-submit"
+                  >
+                    {editingPost 
+                      ? (updateMutation.isPending ? "Updating..." : "Update Post")
+                      : (createMutation.isPending ? "Creating..." : "Create Post")
+                    }
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setIsDialogOpen(false);
+                    setEditingPost(null);
+                    resetForm();
+                  }}>
                     Cancel
                   </Button>
                 </div>
@@ -216,18 +270,28 @@ export default function AdminJournal() {
                       </div>
                       <p className="text-sm text-muted-foreground line-clamp-2">{post.excerpt || post.body.substring(0, 150) + "..."}</p>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        if (confirm(`Delete "${post.title}"?`)) {
-                          deleteMutation.mutate(post.id);
-                        }
-                      }}
-                      data-testid={`button-delete-${post.slug}`}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(post)}
+                        data-testid={`button-edit-${post.slug}`}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (confirm(`Delete "${post.title}"?`)) {
+                            deleteMutation.mutate(post.id);
+                          }
+                        }}
+                        data-testid={`button-delete-${post.slug}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>

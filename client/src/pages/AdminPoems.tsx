@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Edit } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { Poem, Collection } from "@shared/schema";
 
@@ -17,6 +17,7 @@ export default function AdminPoems() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editingPoem, setEditingPoem] = useState<Poem | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
@@ -46,6 +47,23 @@ export default function AdminPoems() {
     },
     onError: () => {
       toast({ title: "Error creating poem", variant: "destructive" });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      const themes = data.themes ? data.themes.split(",").map((t: string) => t.trim()) : [];
+      return apiRequest("PUT", `/api/poems/${id}`, { ...data, themes });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/poems"] });
+      toast({ title: "Poem updated successfully" });
+      setIsDialogOpen(false);
+      setEditingPoem(null);
+      resetForm();
+    },
+    onError: () => {
+      toast({ title: "Error updating poem", variant: "destructive" });
     },
   });
 
@@ -85,7 +103,27 @@ export default function AdminPoems() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    if (editingPoem) {
+      updateMutation.mutate({ id: editingPoem.id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
+  };
+
+  const handleEdit = (poem: Poem) => {
+    setEditingPoem(poem);
+    setFormData({
+      title: poem.title,
+      slug: poem.slug,
+      body: poem.body,
+      excerpt: poem.excerpt || "",
+      collectionId: poem.collectionId || "",
+      themes: poem.themes?.join(", ") || "",
+      audioUrl: poem.audioUrl || "",
+      transcript: poem.transcript || "",
+      imageUrl: poem.imageUrl || "",
+    });
+    setIsDialogOpen(true);
   };
 
   const generateSlug = (title: string) => {
@@ -103,7 +141,13 @@ export default function AdminPoems() {
             </Button>
             <h1 className="text-3xl font-serif font-bold">Manage Poems</h1>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <Dialog open={isDialogOpen} onOpenChange={(open) => {
+            setIsDialogOpen(open);
+            if (!open) {
+              setEditingPoem(null);
+              resetForm();
+            }
+          }}>
             <DialogTrigger asChild>
               <Button data-testid="button-create-poem">
                 <Plus className="h-4 w-4 mr-2" />
@@ -112,8 +156,10 @@ export default function AdminPoems() {
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Create New Poem</DialogTitle>
-                <DialogDescription>Add a new poem to your collection</DialogDescription>
+                <DialogTitle>{editingPoem ? "Edit Poem" : "Create New Poem"}</DialogTitle>
+                <DialogDescription>
+                  {editingPoem ? "Update poem details" : "Add a new poem to your collection"}
+                </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
@@ -205,10 +251,21 @@ export default function AdminPoems() {
                   />
                 </div>
                 <div className="flex gap-2">
-                  <Button type="submit" disabled={createMutation.isPending} data-testid="button-submit">
-                    {createMutation.isPending ? "Creating..." : "Create Poem"}
+                  <Button 
+                    type="submit" 
+                    disabled={createMutation.isPending || updateMutation.isPending} 
+                    data-testid="button-submit"
+                  >
+                    {editingPoem 
+                      ? (updateMutation.isPending ? "Updating..." : "Update Poem")
+                      : (createMutation.isPending ? "Creating..." : "Create Poem")
+                    }
                   </Button>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <Button type="button" variant="outline" onClick={() => {
+                    setIsDialogOpen(false);
+                    setEditingPoem(null);
+                    resetForm();
+                  }}>
                     Cancel
                   </Button>
                 </div>
@@ -245,18 +302,28 @@ export default function AdminPoems() {
                         </div>
                       )}
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => {
-                        if (confirm(`Delete "${poem.title}"?`)) {
-                          deleteMutation.mutate(poem.id);
-                        }
-                      }}
-                      data-testid={`button-delete-${poem.slug}`}
-                    >
-                      <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(poem)}
+                        data-testid={`button-edit-${poem.slug}`}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          if (confirm(`Delete "${poem.title}"?`)) {
+                            deleteMutation.mutate(poem.id);
+                          }
+                        }}
+                        data-testid={`button-delete-${poem.slug}`}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
