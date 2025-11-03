@@ -49,51 +49,7 @@ export default function InstagramGallery() {
             </div>
 
             {/* Instagram Embed Container */}
-            <Card className="p-8 text-center">
-              <Instagram className="h-12 w-12 mx-auto mb-4 text-primary" />
-              <h3 className="text-xl font-semibold mb-3">Live Instagram Feed</h3>
-              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                To display your Instagram posts here, you'll need to set up a widget using a service like 
-                Elfsight, EmbedSocial, or Taggbox. These tools provide real-time syncing with your Instagram account.
-              </p>
-              
-              <div className="bg-muted/50 p-6 rounded-lg max-w-2xl mx-auto mb-6">
-                <p className="text-sm font-semibold mb-3">Setup Instructions:</p>
-                <ol className="text-sm text-left space-y-2 text-muted-foreground">
-                  <li>
-                    <strong>Step 1:</strong> Choose a widget service:
-                    <ul className="ml-6 mt-1 space-y-1">
-                      <li>• <a href="https://elfsight.com/instagram-feed-instashow/" target="_blank" rel="noopener noreferrer" className="text-primary underline">Elfsight</a> (Free plan available)</li>
-                      <li>• <a href="https://embedsocial.com/products/embedfeed/" target="_blank" rel="noopener noreferrer" className="text-primary underline">EmbedSocial</a> (Comprehensive features)</li>
-                      <li>• <a href="https://taggbox.com/instagram-widget/" target="_blank" rel="noopener noreferrer" className="text-primary underline">Taggbox</a> (Great for hashtags)</li>
-                    </ul>
-                  </li>
-                  <li><strong>Step 2:</strong> Connect your Instagram Business account (@poeticallyfathmah)</li>
-                  <li><strong>Step 3:</strong> Customize the feed layout (grid, carousel, or masonry)</li>
-                  <li><strong>Step 4:</strong> Copy the generated embed code</li>
-                  <li><strong>Step 5:</strong> Replace the placeholder in InstagramGallery.tsx with your code</li>
-                </ol>
-              </div>
-
-              {/* Elfsight Instagram Feed Widget */}
-              <div className="elfsight-app-00ab40be-bcbf-4670-a0bd-d4b11781265b" data-elfsight-app-lazy></div>
-            </Card>
-
-            {/* Manual Grid Fallback - Can be populated with recent posts */}
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Card key={i} className="aspect-square overflow-hidden hover-elevate cursor-pointer">
-                  <div className="h-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-                    <div className="text-center p-6">
-                      <Instagram className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                      <p className="text-sm text-muted-foreground">
-                        Instagram post {i}
-                      </p>
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
+            <div className="elfsight-app-00ab40be-bcbf-4670-a0bd-d4b11781265b" data-elfsight-app-lazy></div>
           </div>
         </section>
 
